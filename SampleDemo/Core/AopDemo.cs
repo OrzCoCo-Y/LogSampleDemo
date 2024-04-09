@@ -4,6 +4,11 @@ using ILogger = Serilog.ILogger;
 
 namespace SampleDemo.Yzh.Net.Core
 {
+    /// <summary>
+    /// AOP 拦截器   控制台版本在Autofac_DynamicProxy
+    /// </summary>
+    /// <param name="accessor"></param>
+    /// <param name="logger"></param>
     public class AopDemo(IHttpContextAccessor accessor, ILogger logger) : IInterceptor
     {
         public void Intercept(IInvocation invocation)

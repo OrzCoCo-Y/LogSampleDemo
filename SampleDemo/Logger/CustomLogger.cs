@@ -1,10 +1,9 @@
 ﻿using SampleDemo.Yzh.Net.Core;
 using Serilog;
-using Serilog.Sinks.Elasticsearch;
 
 namespace SampleDemo.Yzh.Net.Logger
 {
-    public static class LoggerStartup
+    public static class CustomLogger
     {
         public static IHostBuilder AddCustomLog(this IHostBuilder builder)
         {

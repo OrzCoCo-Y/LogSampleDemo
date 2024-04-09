@@ -1,33 +1,43 @@
 ﻿using SampleDemo.Yzh.Net.Core;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
-using System;
 
 namespace SampleDemo.Yzh.Net.Logger
 {
     public static class LoggerConfigurationExtensions
     {
+        /// <summary>
+        /// 输出在控制台
+        /// </summary>
+        /// <param name="loggerConfiguration"></param>
+        /// <returns></returns>
         public static LoggerConfiguration WriteToConsole(this LoggerConfiguration loggerConfiguration)
         {
-            //输出普通日志
+            // 输出普通日志
             loggerConfiguration = loggerConfiguration.WriteTo.Logger(lg =>
                 lg.FilterRemoveSqlLog().WriteTo.Console());
 
-            //输出SQL
+            // 输出SQL
             loggerConfiguration = loggerConfiguration.WriteTo.Logger(lg =>
                 lg.FilterSqlLog().WriteTo.Console());
 
             return loggerConfiguration;
         }
 
+        /// <summary>
+        /// 写入文件
+        /// </summary>
+        /// <param name="loggerConfiguration"></param>
+        /// <returns></returns>
         public static LoggerConfiguration WriteToFile(this LoggerConfiguration loggerConfiguration)
         {
-            //输出SQL
+            // SQL语句写入 
             loggerConfiguration = loggerConfiguration.WriteTo.Logger(lg =>
                 lg.FilterSqlLog()
                     .WriteTo.Async(s => s.File(LogContextStatic.Combine(LogContextStatic.EFSql, @"EFSql.txt"), rollingInterval: RollingInterval.Day,
                         outputTemplate: LogContextStatic.FileMessageTemplate, retainedFileCountLimit: 31)));
-            //输出普通日志
+
+            // 非SQL写入
             loggerConfiguration = loggerConfiguration.WriteTo.Logger(lg =>
                 lg.FilterRemoveSqlLog()
                     .WriteTo.Async(s => s.File(LogContextStatic.Combine(LogContextStatic.AuditLogs, @"AuditLog.txt"), rollingInterval: RollingInterval.Hour,
@@ -35,6 +45,11 @@ namespace SampleDemo.Yzh.Net.Logger
             return loggerConfiguration;
         }
 
+        /// <summary>
+        /// 推送至 ES
+        /// </summary>
+        /// <param name="loggerConfiguration"></param>
+        /// <returns></returns>
         public static LoggerConfiguration WriteToElasticsearch(this LoggerConfiguration loggerConfiguration)
         {
             var esUri = AppSettings.GetValue("ElasticConfiguration:Uri");
@@ -51,7 +66,11 @@ namespace SampleDemo.Yzh.Net.Logger
             return loggerConfiguration;
         }
 
-
+        /// <summary>
+        /// 过滤出 SQL语句的日志
+        /// </summary>
+        /// <param name="lc"></param>
+        /// <returns></returns>
         public static LoggerConfiguration FilterSqlLog(this LoggerConfiguration lc)
         {
             return lc.Filter.ByIncludingOnly(e =>
@@ -59,6 +78,11 @@ namespace SampleDemo.Yzh.Net.Logger
             e.Properties["SourceContext"].ToString().Contains("Microsoft.EntityFrameworkCore.Database.Command"));
         }
 
+        /// <summary>
+        /// 过滤非 SQL语句的日志
+        /// </summary>
+        /// <param name="lc"></param>
+        /// <returns></returns>
         public static LoggerConfiguration FilterRemoveSqlLog(this LoggerConfiguration lc)
         {
             return lc.Filter.ByExcluding(e =>

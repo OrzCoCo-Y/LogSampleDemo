@@ -1,5 +1,8 @@
 ﻿namespace SampleDemo.Yzh.Net.Logger
 {
+    /// <summary>
+    /// 日志配置常量
+    /// </summary>
     public class LogContextStatic
     {
         public static readonly string BaseLogs = "Logs";
