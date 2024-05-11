@@ -1,11 +1,12 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
+using SampleDemo.Yzh.Net.Core;
 using SampleDemo.Yzh.Net.Logger;
 using SampleDemo.Yzh.Net.Repository;
 using SampleDemo.Yzh.Net.Service;
-using SampleDemo.Yzh.Net.Core;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
@@ -17,6 +18,9 @@ builder.Host.AddCustomLog();
 // EF
 builder.Services.AddDbContextPool<TestContext>
     (o => o.UseSqlServer(builder.Configuration.GetConnectionString("NicoLocaldbStr"))
+#if DEBUG
+    .EnableSensitiveDataLogging()
+#endif
     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddSerilog())
     ));
 // Http Info
@@ -39,9 +43,18 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = HttpLoggingFields.ResponseBody;
+    // 避免打印大量的请求和响应内容，只打印 4kb
+    logging.RequestBodyLogLimit = 4096;
+    logging.ResponseBodyLogLimit = 4096;
+});
+
 var app = builder.Build();
 // Middleware
-app.UseMiddleware<ResponseLoggingMiddleware>(); //返回客户端响应的日志记录
+//app.UseMiddleware<ResponseLoggingMiddleware>(); //返回客户端响应的日志记录  与 builder.Services.AddHttpLogging作用相似
+app.UseHttpLogging();
 app.UseAuthorization();
 app.MapControllers();
 

@@ -19,7 +19,7 @@ namespace SampleDemo.Yzh.Net.Logger
                 .WriteToElasticsearch()
                 .CreateLogger();
 
-            builder.UseSerilog();
+            builder.UseSerilog(Log.Logger);
             return builder;
         }
     }

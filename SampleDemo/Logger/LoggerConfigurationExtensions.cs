@@ -71,7 +71,7 @@ namespace SampleDemo.Yzh.Net.Logger
         /// </summary>
         /// <param name="lc"></param>
         /// <returns></returns>
-        public static LoggerConfiguration FilterSqlLog(this LoggerConfiguration lc)
+        private static LoggerConfiguration FilterSqlLog(this LoggerConfiguration lc)
         {
             return lc.Filter.ByIncludingOnly(e =>
             e.Properties.ContainsKey("SourceContext") &&
@@ -83,7 +83,7 @@ namespace SampleDemo.Yzh.Net.Logger
         /// </summary>
         /// <param name="lc"></param>
         /// <returns></returns>
-        public static LoggerConfiguration FilterRemoveSqlLog(this LoggerConfiguration lc)
+        private static LoggerConfiguration FilterRemoveSqlLog(this LoggerConfiguration lc)
         {
             return lc.Filter.ByExcluding(e =>
             e.Properties.ContainsKey("SourceContext") &&
